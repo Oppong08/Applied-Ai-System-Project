@@ -9,25 +9,47 @@ You will implement the functions in recommender.py:
 - recommend_songs
 """
 
-from recommender import load_songs, recommend_songs
+try:
+    from recommender import load_songs, recommend_songs
+except ModuleNotFoundError:
+    from src.recommender import load_songs, recommend_songs
 
 
 def main() -> None:
     songs = load_songs("data/songs.csv") 
 
-    # Starter example profile
-    user_prefs = {"genre": "pop", "mood": "happy", "energy": 0.8}
+    # Step 2: user taste profile for scoring comparisons
+    user_prefs = {
+        "favorite_genre": "rock",
+        "favorite_mood": "intense",
+        "target_energy": 0.88,
+        "target_tempo_bpm": 145,
+        "target_valence": 0.45,
+        "target_danceability": 0.62,
+        "target_acousticness": 0.12,
+        # Backward-compatible keys for simple starter scoring logic
+        "genre": "rock",
+        "mood": "intense",
+        "energy": 0.88,
+    }
 
     recommendations = recommend_songs(user_prefs, songs, k=5)
 
-    print("\nTop recommendations:\n")
-    for rec in recommendations:
-        # You decide the structure of each returned item.
-        # A common pattern is: (song, score, explanation)
+    print("\n" + "=" * 70)
+    print("TOP RECOMMENDATIONS")
+    print("=" * 70)
+
+    for index, rec in enumerate(recommendations, start=1):
         song, score, explanation = rec
-        print(f"{song['title']} - Score: {score:.2f}")
-        print(f"Because: {explanation}")
-        print()
+        reasons = [reason.strip() for reason in explanation.split(";") if reason.strip()]
+
+        print(f"\n{index}. {song['title']}")
+        print(f"   Final Score: {score:.2f}")
+        print("   Reasons:")
+        for reason in reasons:
+            print(f"   - {reason}")
+
+    print("\n" + "=" * 70)
 
 
 if __name__ == "__main__":

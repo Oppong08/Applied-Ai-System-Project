@@ -17,17 +17,79 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+Real-world recommenders (like Spotify or YouTube) usually combine many signals from user behavior and song/video attributes, then score candidates and rank the best matches. My version focuses on transparent vibe matching using genre, mood, and energy similarity.
 
-Some prompts to answer:
+Data flow map (Input -> Process -> Output):
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+```mermaid
+flowchart LR
+  A[Input: User Preferences<br/>favorite_genre, favorite_mood, target_energy, top_k]
+  B[Load Songs CSV<br/>songs.csv -> song records]
+  C[Loop Over Songs<br/>Take one song at a time]
+  D[Score Single Song<br/>+2 if genre match<br/>+1 if mood match<br/>+energy similarity]
+  E[Store Result<br/>song + total score + reasons]
+  F{More songs left?}
+  G[Sort All Scored Songs<br/>highest score first]
+  H[Select Top K]
+  I[Output: Ranked Recommendations]
 
-You can include a simple diagram or bullet list if helpful.
+  A --> B --> C --> D --> E --> F
+  F -- Yes --> C
+  F -- No --> G --> H --> I
+```
+
+Algorithm recipe (finalized):
+
+- Genre match: `+2.0`
+- Mood match: `+1.0`
+- Energy similarity: `max(0, 1 - abs(song.energy - target_energy))`
+
+Total score:
+
+`score = genre_points + mood_points + energy_similarity`
+
+Potential bias note:
+
+- This system may over-prioritize genre, which can under-rank songs that match mood and energy well but come from a different genre.
+- Fixed weights can reduce discovery and novelty in recommendations.
+- A small, imbalanced catalog can amplify these effects.
+
+Features used in this simulation:
+
+- `Song` features:
+  - `id`
+  - `title`
+  - `artist`
+  - `genre`
+  - `mood`
+  - `energy`
+  - `tempo_bpm`
+  - `valence`
+  - `danceability`
+  - `acousticness`
+
+- `UserProfile` features:
+  - `favorite_genre`
+  - `favorite_mood`
+  - `target_energy`
+
+Step 2 user profile for comparisons:
+
+```python
+user_profile = {
+    "favorite_genre": "rock",
+    "favorite_mood": "intense",
+    "target_energy": 0.88,
+    "target_tempo_bpm": 145,
+    "target_valence": 0.45,
+    "target_danceability": 0.62,
+    "target_acousticness": 0.12
+}
+```
+
+Inline critique prompt:
+
+"Critique this user profile for my recommender simulation. Will these specific preferences let the model clearly separate intense rock tracks from chill lofi tracks, or is the profile too narrow? Suggest 2 to 3 concrete adjustments (feature additions, value changes, or weight changes) that would improve differentiation without making the system too complex."
 
 ---
 
@@ -53,6 +115,12 @@ pip install -r requirements.txt
 ```bash
 python -m src.main
 ```
+
+### CLI Verification Output
+
+Terminal output showing recommended songs, final scores, and scoring reasons:
+
+![Terminal output showing recommendations](terminal%20output.png)
 
 ### Running Tests
 
