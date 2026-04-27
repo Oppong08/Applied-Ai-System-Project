@@ -1,3 +1,6 @@
 pandas
 pytest
 streamlit
+anthropic
+python-dotenv
+pytest-mock
