@@ -122,6 +122,12 @@ All 9 tests use mocked API calls and pass without a real key.
 
 ## Sample Interactions
 
+> **Demo:** The screenshot below shows the system running end-to-end in a real terminal session. Three annotated text walkthroughs follow showing parsed profiles, retrieved songs, and AI narratives for different request types.
+>
+> **Presentation:** [View the slide deck (Google Drive)](https://drive.google.com/file/d/1SOqWbbRz_gkP895n-jpj8LVsmfTJH7KP/view?usp=drive_link) — covers system architecture, live demo, stretch features, results, and ethics.
+
+![VibeFinder 2.0 terminal output — end-to-end pipeline run](assets/terminal%20output.png)
+
 > **Note:** Retrieved songs and scores are deterministic (computed by the rule-based scoring engine). The AI narrative is generative — your actual output will be similar in structure but may vary in wording.
 
 ---
